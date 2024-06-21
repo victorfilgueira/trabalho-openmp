@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     double t_inicial, t_final;
     int cont = 0, total = 0;
     long int i, n;
+    int num_threads, meu_ranque, inicio, salto;
 
     if (argc < 2)
     {
@@ -32,17 +33,25 @@ int main(int argc, char *argv[])
 
     t_inicial = omp_get_wtime();
 
-#pragma omp parallel for reduction(+ : cont) schedule(dynamic)
-    for (i = 3; i <= n; i += 2)
+#pragma omp parallel private(meu_ranque, inicio, salto, i) reduction(+ : cont)
     {
-        if (primo(i) == 1)
-            cont++;
+        meu_ranque = omp_get_thread_num();
+        num_threads = omp_get_num_threads();
+        inicio = 3 + meu_ranque * 2;
+        salto = num_threads * 2;
+
+        for (i = inicio; i <= n; i += salto)
+        {
+            if (primo(i) == 1)
+                cont++;
+        }
     }
+
+    total = cont + 1; /* Acrescenta o dois, que também é primo */
 
     t_final = omp_get_wtime();
 
-    total = cont + 1; /* Acrescenta o dois, que também é primo */
-    printf("Quant. de primos entre 1 e %ld: %d \n", n, total);
+    printf("Quant. de primos entre 1 e n: %d \n", total);
     printf("Tempo de execucao: %1.3f \n", t_final - t_inicial);
 
     return 0;
