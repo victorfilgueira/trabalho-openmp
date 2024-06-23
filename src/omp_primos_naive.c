@@ -26,14 +26,20 @@ int main(int argc, char *argv[])
         printf("Valor inválido! Entre com um valor do maior inteiro\n");
         return 0;
     }
-    else
+    else if (argc == 2)
     {
         n = strtol(argv[1], (char **)NULL, 10);
+    }
+    else if (argc >= 3)
+    {
+        n = strtol(argv[1], (char **)NULL, 10);
+        num_threads = strtol(argv[2], (char **)NULL, 10);
     }
 
     t_inicial = omp_get_wtime();
 
-#pragma omp parallel private(meu_ranque, inicio, salto, i) reduction(+ : cont)
+    omp_set_num_threads(num_threads);
+    #pragma omp parallel private(meu_ranque, inicio, salto, i) reduction(+ : cont)
     {
         meu_ranque = omp_get_thread_num();
         num_threads = omp_get_num_threads();
