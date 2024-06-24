@@ -17,9 +17,9 @@ int primo(long int n)
 int main(int argc, char *argv[])
 {
     double t_inicial, t_final;
-    int cont = 0, total = 0;
+    int count = 0, total = 0;
     long int i, n;
-    int num_threads, meu_ranque, inicio, salto;
+    int num_threads = 1;
 
     if (argc < 2)
     {
@@ -38,22 +38,22 @@ int main(int argc, char *argv[])
 
     t_inicial = omp_get_wtime();
 
+    // Definimos a quantidade de threads que serão utilizadas pelo 2 arg
+    // 
+    // Criamos uma diretiva parallel e for num loop que passa pelos
+    // números impáres de 3 a n
+    //
+    // No for fazemos o cálculo se i é primo ou não e somamos no count que
+    // é "reduzido" na última parte da diretiva fazendo uma soma
     omp_set_num_threads(num_threads);
-    #pragma omp parallel private(meu_ranque, inicio, salto, i) reduction(+ : cont)
+    #pragma omp parallel for reduction(+ : count)
+    for (i = 3; i <= n; i += 2)
     {
-        meu_ranque = omp_get_thread_num();
-        num_threads = omp_get_num_threads();
-        inicio = 3 + meu_ranque * 2;
-        salto = num_threads * 2;
-
-        for (i = inicio; i <= n; i += salto)
-        {
-            if (primo(i) == 1)
-                cont++;
-        }
+        if (primo(i) == 1)
+            count++;
     }
 
-    total = cont + 1; /* Acrescenta o dois, que também é primo */
+    total = count + 1; /* Acrescenta o dois, que também é primo */
 
     t_final = omp_get_wtime();
 
