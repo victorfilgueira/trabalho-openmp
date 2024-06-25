@@ -7,7 +7,9 @@ RM=rm -vf
 MV=mv
 BINDIR=./bin/
 SRCDIR=./src/
-PROG=teste
+PROG=omp_primos_bag_of_tasks
+RUN_COUNT=5
+ARGS=1000000 8
 
 vpath %.c ./src/
 
@@ -22,8 +24,12 @@ all: $(PROGFILES)
 
 $(BINDIR)%: $(SRCDIR)%.c
 	$(CC) $(INC) $< $(CFLAGS) -o $@ $(LIBS)
-run:  
-	$(BINDIR)$(PROG)
+
+run:
+	@for i in $(shell seq 1 $(RUN_COUNT)); do \
+		echo "Executando $$i vez(es)"; \
+		$(BINDIR)$(PROG) $(ARGS); \
+	done
 
 list:
 	ls $(BINDIR)*
